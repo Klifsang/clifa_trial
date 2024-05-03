@@ -2,18 +2,18 @@
     "version": 2,
     "builds": [
       {
-        "src": "index.py",
+        "src": "/server/index.py",
         "use": "@vercel/python"
       }
     ],
     "routes": [
       {
         "src": "/(.*)",
-        "dest": "/index.py"
+        "dest": "/server/index.py"
       }
     ],
     "env": {
       "FLASK_ENV": "production",
-      "FLASK_APP": "index.py"
+      "FLASK_APP": "/server/index.py"
     }
   }
