@@ -1,18 +1,14 @@
-from flask import Flask, jsonify, send_from_directory
+from flask import Flask
+from flask_cors import CORS
+from server.main import register_routes
 
 app = Flask(
     __name__, 
     static_folder='./client/dist', 
     static_url_path='')
 
-@app.route('/')
-def index():
-    return send_from_directory(app.static_folder, 'index.html')
-
-@app.route('/about')
-def about():
-    return jsonify({'about': 'about me info here'})
-
+register_routes(app)
+CORS(app, origins='*')
 
 if __name__ == '__main__':
   app.run(port=5000)

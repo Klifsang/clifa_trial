@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 
+let truck = 1
 function App() {
-  const [count, setCount] = useState(0)
   const [aboutMessage, setAboutMessage] = useState('');
+  const [latitude, setLatitude] = useState(52.25)
+  const [longitude, setLogitude] = useState(13.37)
+  const [fleet, setFleet] =useState([])
 
   useEffect(() => {
-    console.log('data.message')
+    // recordCordinate()
     fetch('/about') // Relative path to your API route
       .then(response => response.json())
       .then(data => {
@@ -18,33 +19,55 @@ function App() {
       .catch(error => console.error('Error fetching about page:', error));
   }, []);
 
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-      <p className="read-the-docs">
-        {aboutMessage}
-      </p>
-    </>
-  )
+  
+
+  const recordCordinate = () => {
+    truck +=1
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((position) => {
+            const latitude = position.coords.latitude+5;
+            const longitude = position.coords.longitude+10;
+            console.log(latitude)
+            fetch('/track', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 'latitude': latitude, 'longitude': longitude, 'truck':'truck'+truck })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    setFleet(data.points)
+                    console.log(data.points)
+                })
+                .catch(error => console.error('Error fetching about page:', error));
+        });
+    } else {
+        console.error('Geolocation is not supported by this browser.');
+    }
+}
+
+ 
+return (
+  <div>
+    <h1>Clifa</h1>
+    <p className="read-the-docs">{aboutMessage}</p>
+    <button className="btn btn">
+      Shopping List
+    </button>
+    <button className="btn btn" onClick={recordCordinate}>
+      Taxi
+    </button>
+    <ul className="read-the-docs">
+      {fleet.map(flt => (
+        <li key={flt.id}>
+          {flt.id} - {flt.point.lat}, {flt.point.lon}
+        </li>
+      ))}
+    </ul>
+  </div>
+);
+
 }
 
 export default App
